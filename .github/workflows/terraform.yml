@@ -46,10 +46,10 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init -input=false \
-            -backend-config="bucket=gitops-terraform-state" \
+            -backend-config="bucket=gitops-tf-state-latest" \
             -backend-config="key=${ENV}/terraform.tfstate" \
             -backend-config="region=ap-south-1" \
-            -backend-config="dynamodb_table=terraform-locks"
+            -backend-config="dynamodb_table=tf-locks-latest"
 
       - name: Terraform Plan
         run: terraform plan -var-file=../envs/${ENV}.tfvars
