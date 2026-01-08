@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "gitops_tf_state"{
-    bucket = "gitops_terraform_state"
+    bucket = "gitops-terraform-state"
     force_destroy = false
 }
 resource "aws_s3_bucket_versioning" "versioning" {
