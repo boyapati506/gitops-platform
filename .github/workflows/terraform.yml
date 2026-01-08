@@ -25,3 +25,13 @@ jobs:
 
       - name: Verify AWS identity
         run: aws sts get-caller-identity
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=../envs/dev.tfvars
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -var-file=../envs/dev.tfvars  
