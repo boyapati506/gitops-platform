@@ -27,20 +27,28 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      # Determine environment from branch
+      # Determine environment
       - name: Set environment
-        id: env
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+          if [[ "${GITHUB_REF_NAME}" == "master" ]]; then
             echo "ENV=prod" >> $GITHUB_ENV
           else
             echo "ENV=dev" >> $GITHUB_ENV
           fi
 
+      # Determine IAM role
+      - name: Set IAM role
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "master" ]]; then
+            echo "AWS_ROLE=arn:aws:iam::273605040540:role/github-actions-terraform-prod-role" >> $GITHUB_ENV
+          else
+            echo "AWS_ROLE=arn:aws:iam::273605040540:role/github-actions-terraform-dev-role" >> $GITHUB_ENV
+          fi
+
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::273605040540:role/github-actions-terraform-role
+          role-to-assume: ${{ env.AWS_ROLE }}
           aws-region: ap-south-1
 
       - name: Terraform Init
