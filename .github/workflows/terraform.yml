@@ -26,6 +26,10 @@ jobs:
       - name: Verify AWS identity
         run: aws sts get-caller-identity
 
+      - name: Verify Terraform
+        run: terraform version
+  
+
       - name: Terraform Init
         run: terraform init
 
