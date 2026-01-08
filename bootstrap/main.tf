@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "gitops_tf_state"{
-    bucket = "gitops-tf-state"
+    bucket = "gitops-tf-state-latest"
     force_destroy = false
 }
 resource "aws_s3_bucket_versioning" "versioning" {
@@ -19,7 +19,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
 }
 
 resource "aws_dynamodb_table" "gitops_tf_locks" {
-  name         = "tf-locks"
+  name         = "tf-locks-latest"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
