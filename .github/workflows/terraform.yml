@@ -1,4 +1,4 @@
-name: Terraform CI Pipeline
+name: Terraform CI/CD
 
 on:
   push:
@@ -11,31 +11,44 @@ permissions:
 
 jobs:
   terraform:
+    name: Terraform Apply (Dev)
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: terraform
+
     steps:
-      - name: Checkout repository
+      # 1. Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials using OIDC
+      # 2. Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      # 3. Verify Terraform installation (debug-safe)
+      - name: Verify Terraform
+        run: terraform version
+
+      # 4. Configure AWS credentials using OIDC
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::273605040540:role/github-actions-terraform-role
           aws-region: ap-south-1
 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
-
-      - name: Verify Terraform
-        run: terraform version
-  
-
+      # 5. Terraform Init (uses S3 + DynamoDB backend)
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
+      # 6. Terraform Plan
       - name: Terraform Plan
-        run: terraform plan -var-file=../envs/dev.tfvars
+        run: terraform plan -input=false -var-file=../envs/dev.tfvars
 
+      # 7. Terraform Apply (only on main)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -var-file=../envs/dev.tfvars  
+        run: terraform apply -input=false -auto-approve
